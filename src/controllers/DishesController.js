@@ -12,10 +12,10 @@ class DishesController {
       price
     })
 
-    const ingredientsInsert = ingredients.map(ingredient => {
+    const ingredientsInsert = ingredients.map(name => {
       return {
         dish_id,
-        ingredient
+        name
       }
     })
 
