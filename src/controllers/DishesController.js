@@ -73,7 +73,7 @@ class DishesController {
     const allIngredients = await knex('ingredients')
 
     const dishesWithIngredients = dishes.map(dish => {
-      const dishIngredients = allIngredients.map(ingredient => ingredient.dish_id === dish.id)
+      const dishIngredients = allIngredients.filter(ingredient => ingredient.dish_id === dish.id)
 
       return {
         ...dish,
@@ -81,7 +81,6 @@ class DishesController {
       }
     })
 
-    console.log(dishesWithIngredients)
     return res.json(dishesWithIngredients)
   }
 }
