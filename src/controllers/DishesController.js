@@ -3,26 +3,28 @@ const knex = require('../database/knex')
 
 class DishesController {
   async create(req, res) {
-    const { name, description, category, image, price, ingredients } = req.body
+    const { name, description, type, price, ingredients } = req.body
+    const { user_id } = req.params
 
     const [dish_id] = await knex('dishes').insert({
+      user_id,
       name,
       description,
-      category,
-      image,
+      type,
       price
     })
 
     const ingredientsInsert = ingredients.map(name => {
       return {
         dish_id,
+        user_id,
         name
       }
     })
 
     await knex('ingredients').insert(ingredientsInsert)
 
-    res.json()
+    res.json(dish_id)
   }
 
   async show(req, res) {
@@ -57,7 +59,7 @@ class DishesController {
         .select([
           'dishes.id',
           'dishes.name',
-          'dishes.category'
+          'dishes.type'
         ])
         .whereLike('dishes.name', `%${name}%`)
         .whereIn('ingredients.name', filterIngredients)
@@ -82,6 +84,17 @@ class DishesController {
     })
 
     return res.json(dishesWithIngredients)
+  }
+
+  async update(req, res) {
+    const { name, description, type, price, ingredients } = req.body
+    const { dish_id } = req.params
+
+    const dish = await knex('dishes').where('id', dish_id).first()
+
+    if (!dish) {
+      throw new AppError('Dish not found')
+    }
   }
 }
 
