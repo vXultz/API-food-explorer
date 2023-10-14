@@ -2,7 +2,7 @@ const knex = require("../database/knex")
 
 class TypeController {
   async create(req, res) {
-    const { user_id } = req.params
+    const user_id = req.user.id
 
     const { name } = req.body
 

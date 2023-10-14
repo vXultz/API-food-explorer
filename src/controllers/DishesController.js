@@ -1,10 +1,11 @@
 const { removeAllListeners } = require('nodemon')
 const knex = require('../database/knex')
+const AppError = require('../utils/AppError')
 
 class DishesController {
   async create(req, res) {
     const { name, description, type, price, ingredients } = req.body
-    const { user_id } = req.params
+    const user_id = req.user.id
 
     const [dish_id] = await knex('dishes').insert({
       user_id,
@@ -25,6 +26,74 @@ class DishesController {
     await knex('ingredients').insert(ingredientsInsert)
 
     res.json(dish_id)
+  }
+
+  async update(req, res) {
+    const { name, description, price, ingredients, type } = req.body
+    const { dish_id } = req.params
+    const user_id = req.user.id
+
+    const dish = await knex("dishes").where("id", dish_id).first()
+    if (!dish) {
+      throw new AppError("Dish not found")
+    }
+
+    const dishName = await knex("dishes").where("name", name).first()
+
+    if (dishName && Number(dish_id) !== dishName.id) {
+      throw new AppError("Dish name is already in use")
+    }
+
+    if (!name) {
+      name = dish.name
+    }
+
+    if (!description) {
+      description = dish.description
+    }
+
+    if (!price) {
+      price = dish.price
+    }
+
+    if (!type) {
+      type = dish.type
+    }
+
+    if (ingredients) {
+      await knex("ingredients").where("dish_id", dish.id).delete()
+    }
+
+    await knex("dishes")
+      .where("id", dish_id)
+      .update({
+        name,
+        description,
+        price,
+        type
+      })
+
+    const ingredientsArray = ingredients.map(ingredient => {
+      if (ingredient.name) {
+        return ingredient.name
+      } else {
+        return ingredient
+      }
+    })
+
+
+    ingredientsArray.map(
+      async (ingredient) =>
+        await knex("ingredients")
+          .insert({
+            name: ingredient,
+            dish_id: dish.id,
+            user_id
+          })
+    )
+
+
+    return res.json()
   }
 
   async show(req, res) {
@@ -86,16 +155,6 @@ class DishesController {
     return res.json(dishesWithIngredients)
   }
 
-  async update(req, res) {
-    const { name, description, type, price, ingredients } = req.body
-    const { dish_id } = req.params
-
-    const dish = await knex('dishes').where('id', dish_id).first()
-
-    if (!dish) {
-      throw new AppError('Dish not found')
-    }
-  }
 }
 
 
