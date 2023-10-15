@@ -10,20 +10,20 @@ class DishImageController {
     const diskStorage = new DiskStorage()
 
 
-    const dish = await knex('dishes').where({ id: dish.id }).first()
+    const dish = await knex('dishes').where({ id: dish_id }).first()
 
     if (!dish) {
       throw new AppError('Dish not found', 401)
     }
 
-    if (!dish.image) {
+    if (dish.image) {
       await diskStorage.deleteFile(dish.image)
     }
 
     const filename = await diskStorage.saveFile(dishImageFilename)
     dish.image = filename
 
-    await knex('dishes').update(dish).where({ id: dish.id })
+    await knex('dishes').update(dish).where({ id: dish_id })
 
     return res.json(dish)
   }

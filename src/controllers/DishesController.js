@@ -40,7 +40,7 @@ class DishesController {
 
     const dishName = await knex("dishes").where("name", name).first()
 
-    if (dishName && Number(dish_id) !== dishName.id) {
+    if (dishName && (dish_id) !== dishName.id) {
       throw new AppError("Dish name is already in use")
     }
 
