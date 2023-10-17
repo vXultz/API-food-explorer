@@ -64,6 +64,11 @@ Email: vitor@email.com / password: 123
 - Jsonwebtoken
 
 
+## License
+
+Food Explorer is distributed under the [MIT](https://choosealicense.com/licenses/mit/) license. This means you can use, modify, and distribute the code of this project freely, as long as you include the copyright statement and the MIT license in any copy or part of it.
+
+
 ## Autores
 
 - [@vXultz](https://github.com/vXultz)
